@@ -1,0 +1,7 @@
+#Lambda Function Project Metadata
+#Tue Apr 04 16:30:23 EDT 2017
+lastInvokeShowLiveLog=true
+lastDeploymentFunctionName=CustomerService
+lastDeploymentBucketName=customerservicexz
+lastDeploymentEndpoint=https\://lambda.us-west-2.amazonaws.com/
+lastInvokeInput={\n"operation" \: "",\n "resource" \:  "customer", \n "type" \: "CustomerAccount",\n"jwt" \: "eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InpoYW5nLnhpQGNvbHVtYmlhLmVkdSJ9.W9TXe2qw3dCzHLvgC03stpNrJX7fwxifNqMaHCytoFA"\n}\n
