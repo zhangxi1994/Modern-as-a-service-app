@@ -6,11 +6,6 @@ public class RequestClass {
 	private String operation = null;
 	private String resource = null;
 	private String type = null; // LogIn/SignUp CustomerInfo CustomerAccount
-//	private String id = null;
-//	private String first_name = null;
-//	private String last_name = null;
-//	private String password = null;
-//	private String date_of_birth = null;
 	private Customer customer = null;
 	private String jwt = null;
 	

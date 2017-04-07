@@ -31,9 +31,14 @@ public class CustomerService implements RequestHandler<RequestClass, ResponseCla
 		if (type.equals("LogIn")) {
 			CustomerLoginService loginService = new CustomerLoginService(request);
 			response = loginService.login();
+			Map<String, String> map = new HashMap<>();
+			map.put("Access-Control-Allow-Origin","*");
+			response.setHeaders(map);
 		} else if (type.equals("SignUp")) {
 			CustomerSignupService signUpService = new CustomerSignupService(request);
 			response = signUpService.signup();
+			response.setCustomer(request.getCustomer());
+			response.setType(request.getType());
 		} else if (type.equals("CustomerInfo")) {
 			CustomerInfoService infoService = new CustomerInfoService(request.getJwt());
 			response = infoService.getCustomerInfo();
