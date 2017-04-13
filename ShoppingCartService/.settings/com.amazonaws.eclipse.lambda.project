@@ -1,0 +1,5 @@
+#Lambda Function Project Metadata
+#Thu Apr 13 13:36:55 EDT 2017
+lastDeploymentFunctionName=ShoppingCartService
+lastDeploymentBucketName=elasticbeanstalk-us-west-2-364727426203
+lastDeploymentEndpoint=https\://lambda.us-west-2.amazonaws.com/

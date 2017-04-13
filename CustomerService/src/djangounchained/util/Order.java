@@ -7,7 +7,7 @@ public class Order {
 	private String price = null;
 	private String date_time = null;
 	private String address = null;
-	private String payment_method = null;
+	//private String payment_method = null;
 	
 	public String getId() {
 		return id;
@@ -45,11 +45,11 @@ public class Order {
 	public void setAddress(String address) {
 		this.address = address;
 	}
-	public String getPayment_method() {
-		return payment_method;
-	}
-	public void setPayment_method(String payment_method) {
-		this.payment_method = payment_method;
-	}
+//	public String getPayment_method() {
+//		return payment_method;
+//	}
+//	public void setPayment_method(String payment_method) {
+//		this.payment_method = payment_method;
+//	}
 
 }

@@ -1,0 +1,7 @@
+#Lambda Function Project Metadata
+#Thu Apr 13 13:35:01 EDT 2017
+lastInvokeShowLiveLog=true
+lastDeploymentFunctionName=ListItemService
+lastDeploymentBucketName=elasticbeanstalk-us-west-2-364727426203
+lastDeploymentEndpoint=https\://lambda.us-west-2.amazonaws.com/
+lastInvokeInput={\n"resource" \:  "listitem", \n"type" \: "ListAllItems"\n}

@@ -79,7 +79,7 @@ public class DynamoDbHandler {
 		expressionAttributeValues.put(":user_id", userId);
 
 		ItemCollection<ScanOutcome> items = table.scan("user_id = :user_id", // FilterExpression
-				"id, address, item_id, item_name, payment_method, price, date_time, user_id", // ProjectionExpression
+				"id, address, item_id, item_name, price, date_time, user_id", // ProjectionExpression
 				null, // ExpressionAttributeNames - not used in this example
 				expressionAttributeValues);
 
@@ -91,7 +91,7 @@ public class DynamoDbHandler {
 			order.setId(item.getString("id"));
 			order.setItem_id(item.getString("item_id"));
 			order.setItem_name(item.getString("item_name"));
-			order.setPayment_method(item.getString("payment_method"));
+			//order.setPayment_method(item.getString("payment_method"));
 			order.setPrice(item.getString("price"));
 			order.setTime(item.getString("date_time"));
 			orders.add(order);
