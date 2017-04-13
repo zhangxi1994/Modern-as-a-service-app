@@ -81,7 +81,7 @@ public class DynamoDbHandler {
 		expressionAttributeValues.put(":user_id", userId);
 
 		ItemCollection<ScanOutcome> items = table.scan("user_id = :user_id", // FilterExpression
-				"id, item_id, user_id, quantity", // ProjectionExpression
+				"id, item_id, user_id, quantity, price", // ProjectionExpression
 				null, // ExpressionAttributeNames - not used in this example
 				expressionAttributeValues);
 
@@ -92,7 +92,7 @@ public class DynamoDbHandler {
 			Item book = this.read(item.getString("item_id"), "Item");
 			cart_item.setId(book.getString("id"));
 			cart_item.setName(book.getString("item_name"));
-			cart_item.setPrice(book.getString("price"));
+			cart_item.setPrice(item.getInt("price"));
 			cart_item.setDescription(book.getString("description"));
 			cart_item.setQuantity(item.getInt("quantity"));
 			cart.add(cart_item);
@@ -108,7 +108,7 @@ public class DynamoDbHandler {
 		expressionAttributeValues.put(":user_id", userId);
 
 		ItemCollection<ScanOutcome> items = table.scan("user_id = :user_id", // FilterExpression
-				"id, item_id, user_id, quantity", // ProjectionExpression
+				"id, item_id, user_id, quantity, price", // ProjectionExpression
 				null, // ExpressionAttributeNames - not used in this example
 				expressionAttributeValues);
 
@@ -126,28 +126,44 @@ public class DynamoDbHandler {
 
 		Table table = dynamoDB.getTable("Cart");
 		PutItemOutcome outcome = null;
+		
+		Item book = this.read(item_id, "Item");
 
 		Item item = new Item().withPrimaryKey("id", GenerateUUID.generate()).withString("user_id", user_id)
 				.withString("item_id", item_id)
-				.withInt("quantity", 1);
+				.withInt("quantity", 1)
+				.withInt("price", book.getInt("price"));
 		outcome = table.putItem(item);
 
 		return outcome;
 	}
 
-	public UpdateItemOutcome updateCart(String id) {
+	public void updateCart(String id, String item_id) {
+		Item book = this.read(item_id, "Item");
+		
 		Table table = dynamoDB.getTable("Cart");
 
 		Map<String, String> expressionAttributeNames = new HashMap<String, String>();
-		expressionAttributeNames.put("#Q", "quantity");
+		expressionAttributeNames.put("#P", "price");
 
 		Map<String, Object> expressionAttributeValues = new HashMap<String, Object>();
-		expressionAttributeValues.put(":val1", 1); // number
-
-		UpdateItemOutcome outcome = table.updateItem("id", // key attribute
-				id, "set #Q = #Q + :val1", // UpdateExpression
+		expressionAttributeValues.put(":val2", book.getInt("price")); // number
+		
+		table.updateItem("id", // key attribute
+				id, "set #P = #P + :val2", // UpdateExpression
 				expressionAttributeNames, expressionAttributeValues);
-		return outcome;
+		
+		
+		Map<String, String> expressionAttributeNames2 = new HashMap<String, String>();
+		expressionAttributeNames2.put("#Q", "quantity");
+
+		Map<String, Object> expressionAttributeValues2 = new HashMap<String, Object>();
+		expressionAttributeValues2.put(":val1", 1); // number
+		
+		
+		table.updateItem("id", // key attribute
+				id, "set #Q = #Q + :val1", // UpdateExpression
+				expressionAttributeNames2, expressionAttributeValues2);
 	}
 	public DeleteItemOutcome deleteCart(String user_id, String item_id){
 		Table table = dynamoDB.getTable("Cart");

@@ -23,7 +23,7 @@ public class AddCartService {
 		
 		String cartID = dynamo.scanCartExist(customerID, itemID);
 		if(cartID.length() != 0){
-			dynamo.updateCart(cartID);
+			dynamo.updateCart(cartID, itemID);
 			response.setStatus("success");
 			return response;
 		}

@@ -3,10 +3,10 @@ package djangounchained.util;
 public class CartItem {
 	private String id = null;
 	private String item_name = null;
-	private String price = null;
+	//private String price = null;
 	private String description = null;
 	private int quantity = 0;
-	
+	private int price = 0;
 	
 	
 	public int getQuantity() {
@@ -27,10 +27,10 @@ public class CartItem {
 	public void setName(String name) {
 		this.item_name = name;
 	}
-	public String getPrice() {
+	public int getPrice() {
 		return price;
 	}
-	public void setPrice(String price) {
+	public void setPrice(int price) {
 		this.price = price;
 	}
 	public String getDescription() {
