@@ -76,6 +76,7 @@ def make_order(event):
         Message=json.dumps({'default':json.dumps(message)}),
         MessageStructure='json'
     )
+    print("response")
     #print("PutItem Order succeeded:")
     #print(json.dumps(response, indent=4))
     return order_id_list
@@ -84,10 +85,15 @@ def make_order(event):
 
 def lambda_handler(event, context):
     print(type(event))
+    print(event)
+    
     dynamodb = boto3.resource('dynamodb', region_name = "us-west-2")
+    if 'Records' in event:
+        return     
     operation = event['operation']
     #type = event['type']
     #make an order
+    print(event)
     if (operation == 'create'):
         order_id=make_order(event)
         return {"success":"true","order_id":order_id}
