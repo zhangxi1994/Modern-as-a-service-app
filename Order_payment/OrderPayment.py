@@ -31,7 +31,8 @@ def make_order(event):
     item_id_name_map ={}
     for entry in temp:
         item_id_name_map[entry['id']] = entry['item_name']
-    user_id = jwt.decode(event['jwt'], JWT_SECRET, algorithms=JWT_ALGORITHM )
+    #user_id = jwt.decode(event['jwt'], JWT_SECRET, algorithms=JWT_ALGORITHM )
+    user_id = event['stripeEmail']
     items = table.scan()
     items = items['Items']
     my_cart = []
@@ -41,7 +42,7 @@ def make_order(event):
     for item in items:
         #print(item['price'])
         print(item['user_id'],user_id)
-        if item['user_id']==user_id['id']:
+        if item['user_id']==user_id:
             price +=float(item['price'])
             h = hashlib.new('ripemd160')
             date = int(time.time())
@@ -52,7 +53,7 @@ def make_order(event):
             user_dict={}
             user_dict['item_name'] = item_id_name_map[item['item_id']]
             user_dict['item_id'] = item['item_id']
-            user_dict['price'] = int(item['price'])
+            user_dict['price'] = float(item['price'])
             user_dict['order_id'] = order_id
             user_dict['quantity'] = int(item['quantity'])
             user_dict['cart_id'] = item['id']

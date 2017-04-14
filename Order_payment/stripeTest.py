@@ -33,27 +33,28 @@ def respond(err, res=None):
     
 def make_payment(event):
     stripe_keys = {
-      'secret_key': 'sk_test_Hrqp4whe1ZsCTyLzol7jth8v',
-      'publishable_key': 'pk_test_mLVxfSZ0XoplPi6EppPDVic9'
+      'secret_key': 'sk_test_4N4pP8yjoIpK4Gojvs6DpoiN',
+      'publishable_key': 'pk_test_zsMITwkFAOrv7IiPAY2jCm11'
     }
     
     stripe.api_key = stripe_keys['secret_key']
-    card = {
-        "number":event['card_number'],
-        "cvc":event['cvc'],
-        "exp_month": event['exp_month'],
-        "exp_year": event['exp_year'],
-    }
-    token = stripe.Token.create(card=card)
+    # card = {
+    #     "number":event['card_number'],
+    #     "cvc":event['cvc'],
+    #     "exp_month": event['exp_month'],
+    #     "exp_year": event['exp_year'],
+    # }
+    token = event['stripeToken']
     table = dynamodb.Table('Order')
     date = time.strftime("%d/%m/%Y")
-
+    
     my_cart = event['my_cart']
     price = int(event['price']*100)
     print(price)
-    user_id = jwt.decode(event['jwt'], JWT_SECRET, algorithms=JWT_ALGORITHM )
+    #user_id = jwt.decode(event['jwt'], JWT_SECRET, algorithms=JWT_ALGORITHM )
+    user_id = event['stripeEmail']
     customer = stripe.Customer.create(
-        email=user_id['id'],
+        email=user_id,
         source=token
     )
     charge = stripe.Charge.create(
@@ -68,9 +69,9 @@ def make_payment(event):
                 'id': item['order_id'],
                 'item_id ': item['item_id'],
                 'item_name': item['item_name'],
-                'price':item['price'],
+                'price':decimal.Decimal(str(item['price'])),
                 'date_time':date,
-                'user_id':user_id['id']
+                'user_id':user_id
             }
         )
 
@@ -90,7 +91,7 @@ def make_payment(event):
         print(item['quantity'],item['item_id'])
     print("Payment succeeded:")
     #print(json.dumps(response, indent=4))
-    print(user_id['id'])
+    #print(user_id['id'])
     
     table3 = dynamodb.Table('Cart')
     for item in my_cart:
@@ -100,7 +101,7 @@ def make_payment(event):
         },
         ConditionExpression="user_id = :val",
         ExpressionAttributeValues= {
-            ":val": user_id['id']
+            ":val": user_id
         }
     )
     
