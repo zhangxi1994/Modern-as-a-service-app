@@ -92,7 +92,7 @@ public class DynamoDbHandler {
 			Item book = this.read(item.getString("item_id"), "Item");
 			cart_item.setId(book.getString("id"));
 			cart_item.setName(book.getString("item_name"));
-			cart_item.setPrice(item.getInt("price"));
+			cart_item.setPrice(item.getDouble("price"));
 			cart_item.setDescription(book.getString("description"));
 			cart_item.setQuantity(item.getInt("quantity"));
 			cart.add(cart_item);
@@ -132,7 +132,7 @@ public class DynamoDbHandler {
 		Item item = new Item().withPrimaryKey("id", GenerateUUID.generate()).withString("user_id", user_id)
 				.withString("item_id", item_id)
 				.withInt("quantity", 1)
-				.withInt("price", book.getInt("price"));
+				.withDouble("price", book.getDouble("price"));
 		outcome = table.putItem(item);
 
 		return outcome;
@@ -147,7 +147,7 @@ public class DynamoDbHandler {
 		expressionAttributeNames.put("#P", "price");
 
 		Map<String, Object> expressionAttributeValues = new HashMap<String, Object>();
-		expressionAttributeValues.put(":val2", book.getInt("price")); // number
+		expressionAttributeValues.put(":val2", book.getDouble("price")); // number
 		
 		table.updateItem("id", // key attribute
 				id, "set #P = #P + :val2", // UpdateExpression

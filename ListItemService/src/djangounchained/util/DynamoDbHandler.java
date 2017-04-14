@@ -148,7 +148,7 @@ public class DynamoDbHandler {
 			MyItem tmp = new MyItem();
 			tmp.setId(item.getString("id"));
 			tmp.setItem_name(item.getString("item_name"));
-			tmp.setPrice(item.getString("price"));
+			tmp.setPrice(item.getDouble("price"));
 			tmp.setDescription(item.getString("description"));
 			tmp.setIn_stock(item.getInt("in_stock"));
 			allItems.add(tmp);
