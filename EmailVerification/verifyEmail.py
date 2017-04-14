@@ -12,7 +12,7 @@ def verify_email(event, response):
     )
     # print entry
     
-    if entry['Item']['verified']:
+    if entry['Item']['verified'] == "True":
         response["success"] = "True"
         response["AlreadyVerified"] = "True"
         return response

@@ -25,7 +25,7 @@ def lambda_handler(event, context):
     if not 'Item' in entry:
         return resp_failure
         
-    if entry['Item']['verified']:
+    if entry['Item']['verified'] == "True":
         resp_failure['AlreadyVerified'] = True
         return resp_failure
 
