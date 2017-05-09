@@ -20,32 +20,20 @@ def lambda_handler(event, context):
             'id': event['customer']['id'],
         }
     )
-    print entry
+    print "ENTRY", entry
     
     if not 'Item' in entry:
         return resp_failure
         
-    if entry['Item']['verified'] == "True":
+    if entry['Item']['verified'] == True:
         resp_failure['AlreadyVerified'] = True
         return resp_failure
-
-    response = table.update_item(
-                Key={
-                    'id': event['customer']['id'],
-                },
-                UpdateExpression="set hash_val = :r",
-                ExpressionAttributeValues={
-                    ':r': uuid.uuid4().hex
-                },
-                ReturnValues="UPDATED_NEW"
-            )
 
     ses = boto3.client('ses')
     fromEmail = "thejaswi01@gmail.com"
     toEmail = event['customer']['id']
     subject = "Verify Email"
-    message = "Test " + response['Attributes']['hash_val']
-    h = response['Attributes']['hash_val']
+    h = hashlib.sha256(entry['Item']['id'] + entry['Item']['password']).hexdigest()
     user  = event['customer']['id']
     message =  "https://sp1as0yiy2.execute-api.us-west-2.amazonaws.com/Test/verify" + "?hash_val=" + h + "&user=" + user
     

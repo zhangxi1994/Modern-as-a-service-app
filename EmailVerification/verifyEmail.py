@@ -10,28 +10,29 @@ def verify_email(event, response):
             'id': event['id'],
         }
     )
-    # print entry
-    
-    if entry['Item']['verified'] == "True":
-        response["success"] = "True"
-        response["AlreadyVerified"] = "True"
+
+    if entry['Item']['verified'] == True:
+        response["success"] = True
+        response["AlreadyVerified"] = True
         return response
 
-
-    if entry['Item']['hash_val'] and (entry['Item']['hash_val'] == event['hash_val']):
+    hashv = hashlib.sha256(entry['Item']['id'] + entry['Item']['password']).hexdigest()
+    
+    # if entry['Item']['hash_val'] and (entry['Item']['hash_val'] == event['hash_val']):
+    if hashv == event['hash_val']:
         table.update_item(
-            Key={
+            Key = {
                 'id': event['id'],
             },
             UpdateExpression="set verified = :r",
             ExpressionAttributeValues={
                 ':r': bool(1)
             },
-            ReturnValues="UPDATED_NEW"
+            ReturnValues = "UPDATED_NEW"
         )
-        response["success"] = "True"
+        response["success"] = True
     else:
-        response["success"] = "False"
+        response["success"] = False
     return response
     
 
