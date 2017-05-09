@@ -9,6 +9,8 @@ items_id = [];
 
 rec_i = [];
 
+total_price = 0;
+
 var accountDisplayHandler = {
     userName: null,
     loginNavElement: $("#loginNavElement"),
@@ -29,23 +31,32 @@ var handler = StripeCheckout.configure({
     cleanData['stripeToken'] = token.id;
     cleanData['stripeEmail'] = accountDisplayHandler.userName;
     console.log(cleanData);
-    $.ajax({
-        type: "POST",
-        url: 'https://dh0y47otf3.execute-api.us-west-2.amazonaws.com/prod/customer/orderpayment',
-        crossDomain: true,
-        contentType: 'application/json',
-        data: JSON.stringify(cleanData),
-        dataType: 'json',
-        success: function(service_data) {
-           // accountDisplayHandler.cartNavElement.hide();
-           innerHTML = "";
-           $("#cartContent").html(innerHTML);
-        },
-        error: function (e) {
-           alert("Unable to purchase.");
-        }
-    });
-
+    finish = 0;
+    while (!finish){
+      $.ajax({
+          type: "POST",
+          url: 'https://dh0y47otf3.execute-api.us-west-2.amazonaws.com/prod/customer/orderpayment',
+          crossDomain: true,
+          contentType: 'application/json',
+          data: JSON.stringify(cleanData),
+          dataType: 'json',
+          success: function(service_data) {
+             // accountDisplayHandler.cartNavElement.hide();
+             if (service_data['result']==""){
+                innerHTML = "Please wait while the payment is processing ...";
+                $("#cartContent").html(innerHTML);
+             } else {
+                innerHTML = "Payment completed! Thanks for you support.";
+                $("#cartContent").html(innerHTML);
+                finish = 1;
+             }
+          },
+          error: function (e) {
+             alert("Unable to purchase.");
+             finish = 1;
+          }
+      });
+    }
   }
 });
 
@@ -220,6 +231,7 @@ accountDisplayHandler.ordersInfo = function() {
     cleanData['resource'] = 'customer';
     cleanData['type'] = 'CustomerAccount';
     cleanData['jwt'] = jwt_token;
+
     $.ajax({
         type: "POST",
         url: 'https://dh0y47otf3.execute-api.us-west-2.amazonaws.com/prod/customer/order',
@@ -294,6 +306,8 @@ accountDisplayHandler.ordersInfo = function() {
 }
 
 accountDisplayHandler.cartInfo = function() {
+    total_price = 0;
+
     cleanData = {};
     cleanData['resource'] = "shoppingcart";
     cleanData['type'] = "GetCart";
@@ -325,12 +339,14 @@ accountDisplayHandler.cartInfo = function() {
                innerHTML = innerHTML + "<tbody>";
                for(var i=0;i<jsLength;i++){
                     cart_items.push(items_data[i]['id']);
+                    total_price = total_price + parseFloat(items_data[i]['price']);
 
                     innerHTML = innerHTML + "<tr>";
                     innerHTML = innerHTML + "<th scope=\"row\">" + (i+1) + "</th>";
                     innerHTML = innerHTML + "<td>" + items_data[i]['name'] + "</td>";
                     innerHTML = innerHTML + "<td>" + items_data[i]['description'] + "</td>";
                     innerHTML = innerHTML + "<td>" + items_data[i]['price'] + "</td>";
+
                     innerHTML = innerHTML + "<td>" + items_data[i]['quantity'] + "</td>";
                     innerHTML = innerHTML + "</tr>";
                }
@@ -342,6 +358,15 @@ accountDisplayHandler.cartInfo = function() {
                innerHTML = "";
                $("#cartContent").html(innerHTML);
             }
+
+            $( "#paymentButton" ).click(function(e) {
+              handler.open({
+                  name: 'Cart',
+                  description: 'Payment for books',
+                  amount: total_price * 100
+              });
+              e.preventDefault();
+            });
         },
         error: function (e) {
            alert("Unable to retrieve your data.");
@@ -576,14 +601,8 @@ $(document).ready(function() {
     $( "#emptyCart" ).click(function() {
         accountDisplayHandler.emptyCart();
     });
-    $( "#paymentButton" ).click(function(e) {
-        handler.open({
-            name: 'Cart',
-            description: 'Payment for books',
-            amount: 2000
-        });
-        e.preventDefault();
-    });
+  
+
     $( "#datetimepicker" ).datetimepicker({
         pickTime: false
     });
