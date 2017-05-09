@@ -21,6 +21,36 @@ var accountDisplayHandler = {
     cartNavElement: $("#cartNavElement")
 };
 
+function checkPayment(data){
+  // await sleep(500);
+  // console.log(data);
+  $.ajax({
+      type: "POST",
+      url: 'https://dh0y47otf3.execute-api.us-west-2.amazonaws.com/prod/customer/orderpayment',
+      crossDomain: true,
+      contentType: 'application/json',
+      data: JSON.stringify(data),
+      dataType: 'json',
+      success: function(service_data) {
+         console.log(service_data);
+         if (!('Result' in service_data)){
+            innerHTML = "Please wait while your payment is processing ...";
+            $("#cartContent").html(innerHTML);
+            setTimeout(function () {
+              checkPayment(data);
+            }, 2000);  
+         } else {
+            alert("Payment completed! Thanks for you support.");
+            innerHTML = "";
+            $("#cartContent").html(innerHTML);
+         }
+      },
+      error: function (e) {
+         alert("Unable to purchase.");
+      }
+  });
+}
+
 var handler = StripeCheckout.configure({
   key: 'pk_test_zsMITwkFAOrv7IiPAY2jCm11',
   image: 'https://stripe.com/img/documentation/checkout/marketplace.png',
@@ -30,33 +60,36 @@ var handler = StripeCheckout.configure({
     cleanData['resource'] = "order";
     cleanData['stripeToken'] = token.id;
     cleanData['stripeEmail'] = accountDisplayHandler.userName;
+    cleanData['operation'] = "create";
     console.log(cleanData);
-    finish = 0;
-    while (!finish){
-      $.ajax({
-          type: "POST",
-          url: 'https://dh0y47otf3.execute-api.us-west-2.amazonaws.com/prod/customer/orderpayment',
-          crossDomain: true,
-          contentType: 'application/json',
-          data: JSON.stringify(cleanData),
-          dataType: 'json',
-          success: function(service_data) {
-             // accountDisplayHandler.cartNavElement.hide();
-             if (service_data['result']==""){
-                innerHTML = "Please wait while the payment is processing ...";
-                $("#cartContent").html(innerHTML);
-             } else {
-                innerHTML = "Payment completed! Thanks for you support.";
-                $("#cartContent").html(innerHTML);
-                finish = 1;
-             }
-          },
-          error: function (e) {
-             alert("Unable to purchase.");
-             finish = 1;
-          }
-      });
-    }
+    $.ajax({
+        type: "POST",
+        url: 'https://dh0y47otf3.execute-api.us-west-2.amazonaws.com/prod/customer/orderpayment',
+        crossDomain: true,
+        contentType: 'application/json',
+        data: JSON.stringify(cleanData),
+        dataType: 'json',
+        success: function(service_data) {
+           console.log(service_data);
+           cleanData['qIndex'] = service_data['qIndex'];
+
+           if (!('Result' in service_data)){
+              innerHTML = "Please wait while your payment is processing ...";
+              $("#cartContent").html(innerHTML);
+              // checkPayment(cleanData);
+              setTimeout(function () {
+                checkPayment(cleanData);
+              }, 2000); 
+           } else {
+              alert("Payment completed! Thanks for you support.");
+              innerHTML = "";
+              $("#cartContent").html(innerHTML);
+           }
+        },
+        error: function (e) {
+           alert("Unable to purchase.");
+        }
+    });
   }
 });
 
@@ -433,6 +466,7 @@ function login(formData) {
         data: JSON.stringify(cleanData),
         dataType: 'json',
         success: function(service_data){
+           console.log(service_data);
            if (service_data['status']=='success'){
                accountDisplayHandler.logIn(formData.email);
                $('#loginModal').modal('hide')
