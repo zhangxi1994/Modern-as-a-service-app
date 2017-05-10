@@ -21,6 +21,26 @@ var accountDisplayHandler = {
     cartNavElement: $("#cartNavElement")
 };
 
+function sendCompleteRequest(data){
+  data['operation'] = 'removeQueue';
+  $.ajax({
+      type: "POST",
+      url: 'https://dh0y47otf3.execute-api.us-west-2.amazonaws.com/prod/customer/orderpayment',
+      crossDomain: true,
+      contentType: 'application/json',
+      data: JSON.stringify(data),
+      dataType: 'json',
+      success: function(service_data) {
+         // console.log(service_data);
+         console.log('sendCompleteRequest complete!');
+      },
+      error: function (e) {
+         // alert("Unable to purchase.");
+         console.log('sendCompleteRequest error!');
+      }
+  });
+}
+
 function checkPayment(data){
   // await sleep(500);
   // console.log(data);
@@ -43,6 +63,7 @@ function checkPayment(data){
             alert("Payment completed! Thanks for you support.");
             innerHTML = "";
             $("#cartContent").html(innerHTML);
+            sendCompleteRequest(data);
          }
       },
       error: function (e) {
@@ -155,11 +176,14 @@ function render_items () {
     cleanData['resource'] = "allitems";
     cleanData['type'] = "ListAllItems";
     $.ajax({
-        type: "POST",
+        type: "GET",
         url: 'https://dh0y47otf3.execute-api.us-west-2.amazonaws.com/prod/allitems',
         crossDomain: true,
+        // headers: {
+        //   'Authorization':jwt_token
+        // },
         contentType: 'application/json',
-        data: JSON.stringify(cleanData),
+        // data: JSON.stringify(cleanData),
         dataType: 'json',
         success: function(service_data){
            // console.log(service_data);
@@ -225,14 +249,31 @@ accountDisplayHandler.userInfo = function() {
     cleanData['resource'] = 'customer';
     cleanData['type'] = 'CustomerInfo';
     cleanData['jwt'] = jwt_token;
+    // $.ajaxSetup({
+    //   headers: { 'Authorization' : 'eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InRtMjg0OEBjb2x1bWJpY…HUifQ.-Y-a0f6gGw34fQGlxf51Z4SD18hViU5_4mPFTEh8Rx0' }
+    // });
     $.ajax({
-        type: "POST",
-        url: 'https://dh0y47otf3.execute-api.us-west-2.amazonaws.com/prod/customer/info',
+        type: "GET",
+        url: 'https://dh0y47otf3.execute-api.us-west-2.amazonaws.com/prod/customer/info/' + jwt_token,
         crossDomain: true,
         contentType: 'application/json',
         data: JSON.stringify(cleanData),
+        // headers: {
+        //   'Authorization' : jwt_token
+        // },
         dataType: 'json',
+        // beforeSend: function (request) {
+        //       console.log(request);
+        //       // console.log(typeof(jwt_token));
+        //       // console.log(typeof('eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InRtMjg0OEBjb2x1bWJpY…HUifQ.-Y-a0f6gGw34fQGlxf51Z4SD18hViU5_4mPFTEh8Rx0'));
+        //       // console.log(jwt_token);
+        //       // console.log("eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InRtMjg0OEBjb2x1bWJpYS5lZHUifQ.-Y-a0f6gGw34fQGlxf51Z4SD18hViU5_4mPFTEh8Rx0");
+        //       request.setRequestHeader('Authorization', jwt_token);
+        //       // request.setRequestHeader('Access-Control-Allow-Origin', '*');
+        //       // console.log(request);
+        // },
         success: function(service_data){
+           console.log(service_data);
            if (service_data['status']=='success'){
                customer_data = service_data['customer']
                insertHTML = "";
