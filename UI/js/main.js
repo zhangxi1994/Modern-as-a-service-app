@@ -30,8 +30,11 @@ function sendCompleteRequest(data){
       contentType: 'application/json',
       data: JSON.stringify(data),
       dataType: 'json',
+      beforeSend: function (request) {
+              request.setRequestHeader("Authorization", jwt_token);
+      },
       success: function(service_data) {
-         // console.log(service_data);
+         console.log(service_data);
          console.log('sendCompleteRequest complete!');
       },
       error: function (e) {
@@ -51,6 +54,9 @@ function checkPayment(data){
       contentType: 'application/json',
       data: JSON.stringify(data),
       dataType: 'json',
+      // beforeSend: function (request) {
+      //         request.setRequestHeader("Authorization", jwt_token);
+      // },
       success: function(service_data) {
          console.log(service_data);
          if (!('Result' in service_data)){
@@ -58,7 +64,7 @@ function checkPayment(data){
             $("#cartContent").html(innerHTML);
             setTimeout(function () {
               checkPayment(data);
-            }, 2000);  
+            }, 5000);
          } else {
             alert("Payment completed! Thanks for you support.");
             innerHTML = "";
@@ -81,6 +87,7 @@ var handler = StripeCheckout.configure({
     cleanData['resource'] = "order";
     cleanData['stripeToken'] = token.id;
     cleanData['stripeEmail'] = accountDisplayHandler.userName;
+    cleanData['stripeTokenType'] = 'cart';
     cleanData['operation'] = "create";
     console.log(cleanData);
     $.ajax({
@@ -90,6 +97,9 @@ var handler = StripeCheckout.configure({
         contentType: 'application/json',
         data: JSON.stringify(cleanData),
         dataType: 'json',
+        beforeSend: function (request) {
+              request.setRequestHeader("Authorization", jwt_token);
+        },
         success: function(service_data) {
            console.log(service_data);
            cleanData['qIndex'] = service_data['qIndex'];
@@ -257,21 +267,10 @@ accountDisplayHandler.userInfo = function() {
         url: 'https://dh0y47otf3.execute-api.us-west-2.amazonaws.com/prod/customer/info/' + jwt_token,
         crossDomain: true,
         contentType: 'application/json',
-        data: JSON.stringify(cleanData),
-        // headers: {
-        //   'Authorization' : jwt_token
-        // },
         dataType: 'json',
-        // beforeSend: function (request) {
-        //       console.log(request);
-        //       // console.log(typeof(jwt_token));
-        //       // console.log(typeof('eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InRtMjg0OEBjb2x1bWJpY…HUifQ.-Y-a0f6gGw34fQGlxf51Z4SD18hViU5_4mPFTEh8Rx0'));
-        //       // console.log(jwt_token);
-        //       // console.log("eyJhbGciOiJIUzI1NiJ9.eyJpZCI6InRtMjg0OEBjb2x1bWJpYS5lZHUifQ.-Y-a0f6gGw34fQGlxf51Z4SD18hViU5_4mPFTEh8Rx0");
-        //       request.setRequestHeader('Authorization', jwt_token);
-        //       // request.setRequestHeader('Access-Control-Allow-Origin', '*');
-        //       // console.log(request);
-        // },
+        beforeSend: function (request) {
+              request.setRequestHeader("Authorization", jwt_token);
+        },
         success: function(service_data){
            console.log(service_data);
            if (service_data['status']=='success'){
@@ -307,12 +306,17 @@ accountDisplayHandler.ordersInfo = function() {
     cleanData['jwt'] = jwt_token;
 
     $.ajax({
+        // type: "GET",
         type: "POST",
+        // url: 'https://dh0y47otf3.execute-api.us-west-2.amazonaws.com/prod/customer/order/' + jwt_token,
         url: 'https://dh0y47otf3.execute-api.us-west-2.amazonaws.com/prod/customer/order',
         crossDomain: true,
         contentType: 'application/json',
         data: JSON.stringify(cleanData),
         dataType: 'json',
+        beforeSend: function (request) {
+              request.setRequestHeader("Authorization", jwt_token);
+        },
         success: function(service_data){
            if (service_data['status']=='success'){
                orders_data = service_data['orders']
@@ -387,12 +391,15 @@ accountDisplayHandler.cartInfo = function() {
     cleanData['type'] = "GetCart";
     cleanData['jwt'] = jwt_token;
     $.ajax({
-        type: "POST",
-        url: 'https://dh0y47otf3.execute-api.us-west-2.amazonaws.com/prod/customer/shoppingcart',
+        type: "GET",
+        url: 'https://dh0y47otf3.execute-api.us-west-2.amazonaws.com/prod/customer/shoppingcart/' + jwt_token,
         crossDomain: true,
         contentType: 'application/json',
-        data: JSON.stringify(cleanData),
+        // data: JSON.stringify(cleanData),
         dataType: 'json',
+        beforeSend: function (request) {
+              request.setRequestHeader("Authorization", jwt_token);
+        },
         success: function(service_data) {
             if (service_data['status']=='success'){
                items_data = service_data['items'];
@@ -462,12 +469,17 @@ accountDisplayHandler.emptyCart = function () {
     for (var i=0;i<cartLength;i++){
         cleanData['item_id'] = cart_items[i];
         $.ajax({
+            // type: "DELETE",
             type: "POST",
+            // url: 'https://dh0y47otf3.execute-api.us-west-2.amazonaws.com/prod/customer/shoppingcart/' + jwt_token,
             url: 'https://dh0y47otf3.execute-api.us-west-2.amazonaws.com/prod/customer/shoppingcart',
             crossDomain: true,
             contentType: 'application/json',
             data: JSON.stringify(cleanData),
             dataType: 'json',
+            beforeSend: function (request) {
+              request.setRequestHeader("Authorization", jwt_token);
+            },
             success: function(service_data) {
                 if (service_data['status']=='success'){
                     //
